@@ -438,7 +438,7 @@ def main():
 
     instance_tpm = tpm()
 
-    instance_tpm.flush_keys()
+ #   instance_tpm.flush_keys()
 
     # initialize the tmpfs partition to store keys if it isn't already available
 
