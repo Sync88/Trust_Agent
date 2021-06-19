@@ -135,3 +135,12 @@ The libcurl dependency can be satisfied in many ways, and likely change with Ubu
 
         sudo apt install python3-pip
         sudo apt install python-tornado
+        sudo apt-get install libssl-dev swig python3-dev gcc
+        sudo apt-get install python3-gnupg
+
+
+You need to open the keylime.conf file and configure the agent by modifing the field for the ip of the tenant, registrar and verifier
+
+
+        sudo python3 ./agent.py
+
