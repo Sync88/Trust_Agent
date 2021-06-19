@@ -124,22 +124,34 @@ except ImportError:
 
 TPM_LIBS_PATH = '/usr/local/lib/'
 TPM_TOOLS_PATH = '/usr/local/bin/'
+###
+###
+###CHANGES STARTING FROM HERE
+###
+###
 
-
-CONFIG_FILE = os.getenv('KEYLIME_CONFIG', '/etc/keylime.conf')
+#CONFIG_FILE = os.getenv('KEYLIME_CONFIG', '/etc/keylime.conf')
 
 
 WARN = False
-if not os.path.exists(CONFIG_FILE):
+#if not os.path.exists(CONFIG_FILE):
     # try to locate the config file next to the script if bundled
-    if getattr(sys, 'frozen', False):
-        CONFIG_FILE = os.path.dirname(
-            os.path.abspath(sys.executable)) + "/keylime.conf"
-    else:
-        # instead try to get config file from python data_files install
-        CONFIG_FILE = os.path.dirname(os.path.abspath(
-            __file__)) + "/../package_default/keylime.conf"
-        WARN = True
+#if getattr(sys, 'frozen', False):
+CONFIG_FILE = os.path.dirname(
+os.path.abspath(__file__)) + "/keylime.conf"
+#else:
+    # instead try to get config file from python data_files install
+ #   CONFIG_FILE = os.path.dirname(os.path.abspath(
+  #      __file__)) + "/../package_default/keylime.conf"
+# WARN = True
+
+
+###
+###
+###UNTIL HERE
+###
+###
+
 
 if not os.path.exists(CONFIG_FILE):
     raise Exception('%s does not exist. Please set environment variable KEYLIME_CONFIG or see %s for more details' % (
