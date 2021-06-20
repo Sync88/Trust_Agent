@@ -144,3 +144,6 @@ You need to open the keylime.conf file and configure the agent by modifing the f
 
         sudo python3 ./agent.py
 
+
+
+CONFIGURARE KEYLIME SUL FILE DI CONFIGURAZIONE E PROVARE SE FUNZIONA 
