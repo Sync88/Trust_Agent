@@ -139,11 +139,18 @@ The libcurl dependency can be satisfied in many ways, and likely change with Ubu
         sudo apt-get install python3-gnupg
 
 
-You need to open the keylime.conf file and configure the agent by modifing the field for the ip of the tenant, registrar and verifier
+You need to open the keylime.conf file and configure the agent by modifing the field for the ip of the tenant, registrar and verifier.
+Once you have changed the proper fields in the keylime.conf file in the agent, you should configure also the keylime.conf file in the verifier/tenant/registrar node, at /etc/keylime.conf.
 
+Once the configuration is properly set, we can lunch the program.
+The agent should be run only after the verifier node is up, so the order in which the programs should be run is:
+                (on the verifier node)
+                $ sudo keylime_verifier &
+                $ sudo keylime_registrar &
+                
 
-        sudo python3 ./agent.py
+                (on the trust agent, in the directory Trust_agent/Agent)
+                $ sudo python3 ./agent.py
 
-
-
-CONFIGURARE KEYLIME SUL FILE DI CONFIGURAZIONE E PROVARE SE FUNZIONA 
+                (on the verifier again)
+                $ sudo keylime_tenant -c <uuid_agent> -t <ip_agent> -f <file_to_send_encrypted> 
