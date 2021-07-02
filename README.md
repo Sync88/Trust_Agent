@@ -133,10 +133,14 @@ The libcurl dependency can be satisfied in many ways, and likely change with Ubu
 
         install the needed dependencies 
 
+        sudo apt update
         sudo apt install python3-pip
         sudo apt install python-tornado
         sudo apt-get install libssl-dev swig python3-dev gcc
         sudo apt-get install python3-gnupg
+
+        pip install pyyaml
+        pip install simplejson
 
 
 You need to open the keylime.conf file and configure the agent by modifing the field for the ip of the tenant, registrar and verifier.
