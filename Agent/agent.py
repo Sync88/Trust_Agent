@@ -469,11 +469,16 @@ def main():
         registrar_ip, registrar_port, agent_uuid, ek_tpm, ekcert, aik_tpm)
 
 
-
+    if keyblob is None:
+        instance_tpm.flush_keys()
+        raise Exception("Registration failed")
+        
+        
     # get the ephemeral registrar key
     key = instance_tpm.activate_identity(keyblob)
 
     if key is None:
+        instance_tpm.flush_keys()
         raise Exception("Activation failed")
 
     # tell the registrar server we know the key
@@ -482,6 +487,7 @@ def main():
         registrar_ip, registrar_port, agent_uuid, key)
 
     if not retval:
+    	instance_tpm.flush_keys()
         raise Exception("Registration failed on activate")
         
 
@@ -492,6 +498,15 @@ def main():
 
     logger.info("Starting Cloud Agent on %s:%s use <Ctrl-C> to stop", serveraddr[0], serveraddr[1])
     serverthread.start()
+    
+    
+    try:
+    	while True:
+    	    time.sleep(1)
+    except KeyboardInterrupt:
+	    logger.info("TERM Signal received, shutting down...")
+            instance_tpm.flush_keys()
+            server.shutdown()
 
 
 if __name__ == "__main__":
