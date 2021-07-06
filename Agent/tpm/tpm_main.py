@@ -704,8 +704,7 @@ class tpm(tpm_abstract.AbstractTPM):
                     self.__run(["tpm2_evictcontrol", "-A", "o", "-H", hex(key), "-P", owner_pw],
                                raiseOnError=False)
                 else:
-                    self.__run(["tpm2_evictcontrol", "-C", "o", "-c", hex(key), "-P", owner_pw],
-                               raiseOnError=False)
+                    self.__run(["tpm2_evictcontrol", "-C", "p", "-c", str(key)], raiseOnError=False)
 
     def encryptAIK(self, uuid, ek_tpm: bytes, aik_tpm: bytes):
         ekFile = None
