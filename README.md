@@ -128,17 +128,21 @@ Once you have installed these 3 components reebot your system.
 
         install the needed dependencies 
 
+        sudo apt update
         sudo apt install python3-pip
         sudo apt install python3-tornado
         sudo apt-get install libssl-dev swig python3-dev gcc
         sudo apt-get install python3-gnupg
+
+        sudo pip3 install pyyaml
+        sudo pip3 install simplejson
 
 
         (sulla schedina ho fatto 
 
 
                 $ sudo apt install python3-pip
-                $ sudo apt install python3-tornado
+                $ sudo apt install python3-tornadocd tru                                
                 $ sudo apt update
                 $ sudo apt-get install libssl-dev swig python3-dev              
                 $ sudo apt install python3-gnupg
