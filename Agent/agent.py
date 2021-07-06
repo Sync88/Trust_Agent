@@ -21,6 +21,7 @@ import io
 import shutil
 import subprocess
 import json
+import time
 
 # Configure logger
 logger = keylime_logging.init_logging('cloudagent')
@@ -438,8 +439,6 @@ def main():
 
     instance_tpm = tpm()
 
- #   instance_tpm.flush_keys()
-
     # initialize the tmpfs partition to store keys if it isn't already available
 
     # get params for initialization
@@ -453,11 +452,7 @@ def main():
     # change dir to working dir
     config.ch_dir(config.WORK_DIR, logger)
 
-    # agent_ip = config.get('cloud_agent', 'cloudagent_ip')
-    # agent_port = config.get('cloud_agent', 'cloudagent_port')
-    # verifier_ip = config.get('cloud_verifier', "cloudverifier_ip")
-    # verifier_port = config.get('cloud_verifier', "cloudverifier_port")
-   
+
     # initialize tpm
     (ekcert, ek_tpm, aik_tpm) = instance_tpm.tpm_init(self_activate=False, config_pw="keylime")
     
@@ -501,12 +496,12 @@ def main():
     
     
     try:
-    	while True:
-    	    time.sleep(1)
+        while True:
+            time.sleep(1)
     except KeyboardInterrupt:
-	    logger.info("TERM Signal received, shutting down...")
-            instance_tpm.flush_keys()
-            server.shutdown()
+        logger.info("TERM Signal received, shutting down...")
+        instance_tpm.flush_keys()
+        server.shutdown()
 
 
 if __name__ == "__main__":
