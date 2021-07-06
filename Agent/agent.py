@@ -21,6 +21,7 @@ import io
 import shutil
 import subprocess
 import json
+import time
 
 # Configure logger
 logger = keylime_logging.init_logging('cloudagent')
@@ -438,8 +439,6 @@ def main():
 
     instance_tpm = tpm()
 
- #   instance_tpm.flush_keys()
-
     # initialize the tmpfs partition to store keys if it isn't already available
 
     # get params for initialization
@@ -453,11 +452,7 @@ def main():
     # change dir to working dir
     config.ch_dir(config.WORK_DIR, logger)
 
-    # agent_ip = config.get('cloud_agent', 'cloudagent_ip')
-    # agent_port = config.get('cloud_agent', 'cloudagent_port')
-    # verifier_ip = config.get('cloud_verifier', "cloudverifier_ip")
-    # verifier_port = config.get('cloud_verifier', "cloudverifier_port")
-   
+
     # initialize tpm
     (ekcert, ek_tpm, aik_tpm) = instance_tpm.tpm_init(self_activate=False, config_pw="keylime")
     
@@ -469,11 +464,16 @@ def main():
         registrar_ip, registrar_port, agent_uuid, ek_tpm, ekcert, aik_tpm)
 
 
-
+    if keyblob is None:
+        instance_tpm.flush_keys()
+        raise Exception("Registration failed")
+        
+        
     # get the ephemeral registrar key
     key = instance_tpm.activate_identity(keyblob)
 
     if key is None:
+        instance_tpm.flush_keys()
         raise Exception("Activation failed")
 
     # tell the registrar server we know the key
@@ -482,6 +482,7 @@ def main():
         registrar_ip, registrar_port, agent_uuid, key)
 
     if not retval:
+    	instance_tpm.flush_keys()
         raise Exception("Registration failed on activate")
         
 
@@ -492,6 +493,15 @@ def main():
 
     logger.info("Starting Cloud Agent on %s:%s use <Ctrl-C> to stop", serveraddr[0], serveraddr[1])
     serverthread.start()
+    
+    
+    try:
+        while True:
+            time.sleep(1)
+    except KeyboardInterrupt:
+        logger.info("TERM Signal received, shutting down...")
+        instance_tpm.flush_keys()
+        server.shutdown()
 
 
 if __name__ == "__main__":

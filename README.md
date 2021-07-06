@@ -2,18 +2,10 @@
 
 This repository contains code for running the Keylime Trust Agent, one of the three major components of the Keylime trust system.
 
-The Trust Agent should be installed on the remote machine that is to be measured or provisioned wth secrets stored within an encrypted payload delivered once trust is estabilished.
+The Trust Agent should be installed on the remote machine that is to be measured or provisioned with secrets stored within an encrypted payload delivered once trust is estabilished.
+haedware section of your virtual machine. n order to do this you have to install swtpm on your host machine. Use the CRB mode, selecting an emulated device for a TPM 2.0)
 
-## Trust Agent installation
-
-Clone this repository on your local machine, then switch to the last stable branch, tag `6.1.0`
-
-        $ git clone 
-        $ cd keylime
-        $ git checkout tags/6.1.0
-
-
-        - python 3.6 is required 
+(if you are using a virtual machine on KVM, remember to add a TPM in the hardware section of your virtual machine. In order to do this you have to install swtpm on your host machine. Use the CRB mode, selecting an emulated device for a TPM 2.0)
 
 
 # from tpm2-tss INSTALL.md
@@ -124,6 +116,9 @@ The libcurl dependency can be satisfied in many ways, and likely change with Ubu
 
 (###ho avuto un piccolo problema con il simulatore dell'TPM da aggiungere a KVM. E' bastato ricompilare e instllare swtpm sull'host)
 
+
+Once you have installed these 3 components reebot your system.
+
 ## install the trust agent
 
         $ git clone https://github.com/Sync88/Trust_Agent.git
@@ -133,10 +128,27 @@ The libcurl dependency can be satisfied in many ways, and likely change with Ubu
 
         install the needed dependencies 
 
+        sudo apt update
         sudo apt install python3-pip
-        sudo apt install python-tornado
+        sudo apt install python3-tornado
         sudo apt-get install libssl-dev swig python3-dev gcc
         sudo apt-get install python3-gnupg
+
+        sudo pip3 install pyyaml
+        sudo pip3 install simplejson
+
+
+        (sulla schedina ho fatto 
+
+
+                $ sudo apt install python3-pip
+                $ sudo apt install python3-tornadocd tru                                
+                $ sudo apt update
+                $ sudo apt-get install libssl-dev swig python3-dev              
+                $ sudo apt install python3-gnupg
+                $ sudo apt install yamlmode (NOT NEEDED)
+                in the file Agent/tpm/tpm_main.py ho cambiato l'import di json)
+        )
 
 
 You need to open the keylime.conf file and configure the agent by modifing the field for the ip of the tenant, registrar and verifier.
