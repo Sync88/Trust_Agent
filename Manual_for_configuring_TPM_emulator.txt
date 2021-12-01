@@ -1,0 +1,91 @@
+1) Install Ubuntu 20.04 LTS.
+
+2) Python requirements:
+	$ sudo apt install libssl-dev swig python3-pip
+
+3) Uninstall libtss2 version 2.3.2
+
+    $ sudo apt remove libtss2-esys0
+    $ sudo apt autoclean && sudo apt autoremove
+	
+3) Manually build and install libtss2 version >= 2.4.0 and tpm2-tools
+
+    $ sudo apt install autoconf autoconf-archive libglib2.0-dev libtool pkg-config libjson-c-dev libcurl4-gnutls-dev
+
+    a. Manually build and install libtss2 library
+
+     $ git clone https://github.com/tpm2-software/tpm2-tss.git
+     $ cd tpm2-tss
+     $ ./bootstrap
+     $ ./configure --prefix=/usr
+     $ make
+     $ sudo make install
+
+    b. Manually build and install tpm2-tools
+
+     $ git clone https://github.com/tpm2-software/tpm2-tools.git
+     $ cd tpm2-tools
+     $ ./bootstrap
+     $ ./configure --prefix=/usr/local
+     $ make
+     $ sudo make install
+
+
+8) Install TPM 2.0 emulator (https://francislampayan.medium.com/how-to-setup-tpm-simulator-in-ubuntu-20-04-25ec673b88dc):
+
+	# install dependencies
+	$ sudo apt-get install lcov \
+	pandoc autoconf-archive liburiparser-dev \
+	libdbus-1-dev libglib2.0-dev dbus-x11 \
+	libssl-dev autoconf automake \
+	libtool pkg-config gcc \
+	libcurl4-gnutls-dev libgcrypt20-dev libcmocka-dev uthash-dev \
+
+	# download TPM simulator
+	wget https://jaist.dl.sourceforge.net/project/ibmswtpm2/ibmtpm1661.tar.gz
+
+	# create installation directory to extract towards into
+	mkdir ibmtpm1661
+	cd ibmtpm1661
+	tar -xzvf ../ibmtpm1661.tar.gz
+
+	# enter src/ directory and execute build
+	cd src/
+	sudo make
+
+	# copy the built executable to your bin directory
+	sudo cp tpm_server /usr/local/bin
+
+	# configure TPM simulator as a daemon service in ubuntu
+	sudo vim /lib/systemd/system/tpm-server.service
+
+	# add the following content to the file
+	[Unit]
+	Description=TPM2.0 Simulator Server daemon
+	Before=tpm2-abrmd.service
+	[Service]
+	ExecStart=/usr/local/bin/tpm_server
+	Restart=always
+	Environment=PATH=/usr/bin:/usr/local/bin
+	[Install]
+	WantedBy=multi-user.target
+
+	# reload daemon and start the service
+	systemctl daemon-reload
+	systemctl start tpm-server.service
+
+	# check its status, if all is fine should be in Active state
+	service tpm-server status
+
+9) Configure TPM Command Transmission Interface (TCTI) for TPM 2.0 Simulator
+
+	$ export TPM2TOOLS_TCTI="mssim:host=localhost,port=2321"
+	
+10) Send a startup command to the TPM:
+
+	$ sudo tpm2_startup -c
+
+11) Use the TPM 2.0 emulator, for example:
+
+	$ sudo tpm2_pcrread
+	
