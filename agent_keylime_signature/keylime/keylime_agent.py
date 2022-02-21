@@ -105,7 +105,7 @@ class Handler(BaseHTTPRequestHandler):
             vpcrmask = rest_params.get('vmask', None)
             ima_ml_entry = rest_params.get('ima_ml_entry', '0')
             #SILVIO
-            physical_tpm = rest_params.get('physical_tpm', '1')
+            #physical_tpm = rest_params.get('physical_tpm', '1')
 
             # if the query is not messed up
             if nonce is None:
@@ -128,7 +128,7 @@ class Handler(BaseHTTPRequestHandler):
             hash_alg = tpm_instance.defaults['hash']
             if not tpm_instance.is_vtpm() or rest_params["quotes"] == 'identity':
                 quote = tpm_instance.create_quote(
-                    nonce, self.server.rsapublickey_exportable, pcrmask, hash_alg, physical_tpm)
+                    nonce, self.server.rsapublickey_exportable, pcrmask, hash_alg, self.server.physical_tpm)
                 imaMask = pcrmask
 
             # Allow for a partial quote response (without pubkey)
@@ -163,7 +163,7 @@ class Handler(BaseHTTPRequestHandler):
                     response['ima_measurement_list'] = ml
                     response['ima_measurement_list_entry'] = nth_entry
                     self.server.next_ima_ml_entry = num_entries
-                    if physical_tpm == 0:
+                    if self.server.physical_tpm:
                         signature = tpm_instance.ml_sign(ml,"signature_file")
                         response['signature'] = base64.b64encode(signature)
 
@@ -366,9 +366,11 @@ class CloudAgentHTTPServer(ThreadingMixIn, HTTPServer):
     final_U = None
     agent_uuid = None
     next_ima_ml_entry = 0 # The next IMA log offset the verifier may ask for.
+    #Silvioo
+    physical_tpm = True
     boottime = int(psutil.boot_time())
 
-    def __init__(self, server_address, RequestHandlerClass, agent_uuid):
+    def __init__(self, server_address, RequestHandlerClass, agent_uuid, physical_tpm):
         """Constructor overridden to provide ability to pass configuration arguments to the server"""
         secdir = secure_mount.mount()
         keyname = os.path.join(secdir,
@@ -398,6 +400,7 @@ class CloudAgentHTTPServer(ThreadingMixIn, HTTPServer):
             self, server_address, RequestHandlerClass)
         self.enc_keyname = config.get('cloud_agent', 'enc_keyname')
         self.agent_uuid = agent_uuid
+        self.physical_tpm = physical_tpm
 
     def add_U(self, u):
         """Threadsafe method for adding a U value received from the Tenant
@@ -566,10 +569,11 @@ def main():
 
     logger.info("Agent UUID: %s", agent_uuid)
 
+    physical_tpm = config.get('cloud_agent', 'physical_tpm')
 
     # register it and get back a blob
     keyblob = registrar_client.doRegisterAgent(
-        registrar_ip, registrar_port, agent_uuid, ek_tpm, ekcert, aik_tpm, contact_ip, contact_port)
+        registrar_ip, registrar_port, agent_uuid, ek_tpm, ekcert, aik_tpm, contact_ip, contact_port, physical_tpm)
 
     if keyblob is None:
         instance_tpm.flush_keys()
@@ -593,7 +597,7 @@ def main():
 
     serveraddr = (config.get('cloud_agent', 'cloudagent_ip'),
                   config.getint('cloud_agent', 'cloudagent_port'))
-    server = CloudAgentHTTPServer(serveraddr, Handler, agent_uuid)
+    server = CloudAgentHTTPServer(serveraddr, Handler, agent_uuid, physical_tpm)
     serverthread = threading.Thread(target=server.serve_forever)
 
     logger.info("Starting Cloud Agent on %s:%s with API version %s. Use <Ctrl-C> to stop", serveraddr[0], serveraddr[1], keylime_api_version.current_version())

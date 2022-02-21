@@ -125,11 +125,11 @@ def getData(registrar_ip, registrar_port, agent_id):
     
 
 #SILVIO add parameter
-def doRegisterAgent(registrar_ip, registrar_port, agent_id, ek_tpm, ekcert, aik_tpm, contact_ip = None, contact_port = None):
+def doRegisterAgent(registrar_ip, registrar_port, agent_id, ek_tpm, ekcert, aik_tpm, contact_ip = None, contact_port = None, physical_tpm = 1):
     data = {
         'ekcert': ekcert,
         'aik_tpm': aik_tpm,
-        #'physical_tpm' : physical_tpm, #SILVIO added field
+        'physical_tpm' : physical_tpm,
     }
     if ekcert is None or ekcert == 'emulator':
         data['ek_tpm'] = ek_tpm
