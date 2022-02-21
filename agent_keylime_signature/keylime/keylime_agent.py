@@ -163,7 +163,7 @@ class Handler(BaseHTTPRequestHandler):
                     response['ima_measurement_list'] = ml
                     response['ima_measurement_list_entry'] = nth_entry
                     self.server.next_ima_ml_entry = num_entries
-                    if self.server.physical_tpm:
+                    if not self.server.physical_tpm:
                         signature = tpm_instance.ml_sign(ml,"signature_file")
                         response['signature'] = base64.b64encode(signature)
 
@@ -569,7 +569,7 @@ def main():
 
     logger.info("Agent UUID: %s", agent_uuid)
 
-    physical_tpm = config.get('cloud_agent', 'physical_tpm')
+    physical_tpm = config.getboolean('cloud_agent', 'physical_tpm')
 
     # register it and get back a blob
     keyblob = registrar_client.doRegisterAgent(
